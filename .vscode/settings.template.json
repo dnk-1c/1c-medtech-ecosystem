@@ -1,0 +1,40 @@
+{
+  "// Инструкция": "Скопируйте нужные настройки в .vscode/settings.json",
+  "// Документация": "https://github.com/yellow-hammer/vscode-1c-platform-tools",
+
+  "editor.defaultFormatter": "1c-syntax.vscode-1c-bsl",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+
+  "[bsl]": {
+    "editor.defaultFormatter": "1c-syntax.vscode-1c-bsl"
+  },
+
+  "language-1c-bsl.enableLanguageServer": true,
+
+  "1c-platform-tools.ipc.enabled": true,
+  "1c-platform-tools.ipc.host": "127.0.0.1",
+  "1c-platform-tools.ipc.port": 40241,
+
+  "1c-platform-tools.paths.cf": "src/cf",
+  "1c-platform-tools.paths.cfe": "src/cfe",
+
+  "1c-platform-tools.projects.baseFolders": [
+    "D:/git/dnk-1c"
+  ],
+
+  "1c-platform-tools.metadata.schemasDir": "docs/schemas",
+
+  "1c-platform-tools.logLevel": "info",
+
+  "files.associations": {
+    "packagedef": "bsl",
+    "*.os": "bsl"
+  },
+
+  "files.exclude": {
+    "**/.gitkeep": true,
+    "**/build/ib": true,
+    "**/oscript_modules": true
+  }
+}

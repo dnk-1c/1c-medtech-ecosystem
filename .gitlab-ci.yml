@@ -1,0 +1,88 @@
+# .gitlab-ci.yml — CI/CD для расширения 1С
+# GitHub Actions аналог: .github/workflows/ci.yml
+
+stages:
+  - check
+  - review
+  - build
+  - test
+  - deploy
+
+variables:
+  BSL_LS_VERSION: "latest"
+
+# ── Синтаксический контроль ──────────────────────────────────────
+syntax-check:
+  stage: check
+  image: eclipse-temurin:21-jre
+  script:
+    - curl -L https://github.com/1c-syntax/bsl-language-server/releases/latest/download/bsl-language-server.jar
+        -o bsl-ls.jar
+    - java -jar bsl-ls.jar --analyze --srcDir src/cf --reporter json --outputDir reports/
+  artifacts:
+    paths:
+      - reports/
+    when: always
+
+# ── AI Review (только для Merge Request) ─────────────────────────
+ai-review:
+  stage: review
+  image: python:3.12-slim
+  only:
+    - merge_requests
+  script:
+    - git diff origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME...HEAD -- 'src/**/*.bsl' > mr_diff.txt
+    - pip install anthropic --quiet
+    - python3 scripts/ai_review.py mr_diff.txt
+  variables:
+    ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY   # задать в Settings → CI/CD → Variables
+
+# ── Сборка .cfe (требует self-hosted runner с 1С) ─────────────────
+build-cfe:
+  stage: build
+  tags:
+    - onec-runner    # self-hosted runner с установленной платформой 1С
+  needs: [syntax-check]
+  script:
+    - oscript tasks/build.os
+  artifacts:
+    paths:
+      - build/*.cfe
+    expire_in: 7 days
+
+# ── xUnit тесты ──────────────────────────────────────────────────
+xunit-tests:
+  stage: test
+  tags:
+    - onec-runner
+  needs: [build-cfe]
+  script:
+    - oscript tasks/test.os xunit
+  artifacts:
+    reports:
+      junit: reports/xunit.xml
+
+# ── Vanessa BDD ──────────────────────────────────────────────────
+bdd-tests:
+  stage: test
+  tags:
+    - onec-runner
+  needs: [build-cfe]
+  script:
+    - oscript tasks/test.os bdd
+  artifacts:
+    paths:
+      - reports/allure/
+
+# ── Деплой в тестовую ИБ ─────────────────────────────────────────
+deploy-test:
+  stage: deploy
+  tags:
+    - onec-runner
+  needs: [xunit-tests, bdd-tests]
+  only:
+    - production
+  script:
+    - oscript tasks/deploy.os test
+  environment:
+    name: test

@@ -1,0 +1,68 @@
+# Локальная конфигурация среды (пути к базам, токены)
+env.json
+
+# Бинарные файлы 1С (хранить в LFS или не коммитить)
+*.cf
+*.cfe
+*.epf
+*.erf
+*.mxl
+
+# Исходная конфигурация (может быть большой — LFS или исключить)
+# Раскомментировать если не хотите хранить в git:
+# tools/source — исходная конфигурация
+
+# VS Code локальные настройки
+.vscode/settings.json
+.vscode/launch.json
+
+# oScript кэш
+*.compiled
+
+# Временные файлы
+*.tmp
+*.bak
+~$*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node (если используется MCP сервер)
+node_modules/
+
+# v8unpack — бинарник загружается автоматически через tools/get-v8unpack.ps1
+tools/v8unpack.exe
+
+# Портативные инструменты (устанавливаются через tools/get-tools.ps1)
+tools/python/
+tools/oscript/
+tools/jre/
+tools/bsl-ls.jar
+# v8unpack.exe уже есть выше
+
+# 1C: Platform Tools — результаты сборки и ИБ
+build/ib/
+build/out/
+
+# ER-диаграммы генерируются автоматически
+docs/schemas/
+
+# OPM кэш зависимостей
+oscript_modules/
+
+# src/ как встроенный проект — игнорировать артефакты сборки
+src/build/ib/
+src/build/out/
+src/docs/schemas/
+src/oscript_modules/
+src/env.json
+
+# Если src/ подключён как submodule — его содержимое управляется отдельным репо
+# (git автоматически не отслеживает содержимое submodule)
+-e 
+# Логи инструментов
+tools/logs/
+
+# Репозитории внутри экосистемы (добавляется PM автоматически)

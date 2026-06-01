@@ -1,0 +1,53 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "D:/git/dnk-1c/1c-medtech-ecosystem"
+      ]
+    },
+    "git": {
+      "command": "D:/git/dnk-1c/1c-medtech-ecosystem/tools/python/python.exe",
+      "args": [
+        "-m",
+        "mcp_server_git",
+        "--repository",
+        "D:/git/dnk-1c/1c-medtech-ecosystem"
+      ]
+    },
+    "github": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+      }
+    },
+    "sequential-thinking": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  },
+  "_notes": {
+    "git": "mcp-server-git устанавливается через tools/get-tools.ps1 → tools/python/",
+    "filesystem_path": "PM replaces placeholder path during initialization",
+    "github": "Optional — only needed with GitHub hosting. PM removes this in local-only mode."
+  },
+  "_template": {
+    "placeholder_path": "D:/git/1c-extension-ecosystem",
+    "note": "PM: replace placeholder_path with real project path in all mcpServers args"
+  }
+}

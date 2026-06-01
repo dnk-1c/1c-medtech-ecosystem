@@ -1,0 +1,14 @@
+# .gitmodules — шаблон подключения src/ как git submodule
+#
+# Использовать если src/ — отдельный репозиторий проекта 1C: Platform Tools.
+#
+# Инициализация:
+#   git submodule add <url-репозитория-проекта> src
+#   git submodule update --init --recursive
+#
+# После этого раскомментировать и заполнить:
+#
+# [submodule "src"]
+#     path = src
+#     url = https://github.com/<org>/<project-repo>.git
+#     branch = main

@@ -1,0 +1,75 @@
+name: CI — Build & Test Extension
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches: [ production ]
+  pull_request:
+    branches: [ production ]
+
+jobs:
+
+  syntax-check:
+    name: Синтаксический контроль (BSL LS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Установить BSL Language Server
+        run: |
+          curl -L https://github.com/1c-syntax/bsl-language-server/releases/latest/download/bsl-language-server.jar \
+            -o bsl-ls.jar
+
+      - name: Синтаксический контроль
+        run: |
+          java -jar bsl-ls.jar --analyze \
+            --srcDir src/cfe \
+            --reporter json \
+            --outputDir reports/
+
+      - name: Загрузить отчёт
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: bsl-report
+          path: reports/
+
+  ai-review:
+    name: AI Code Review (Claude)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Получить diff PR
+        run: |
+          git diff origin/${{ github.base_ref }}...HEAD \
+            -- 'src/**/*.bsl' > pr_diff.txt
+
+      - name: AI Review через Claude API
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 scripts/ai_review.py pr_diff.txt
+
+  # Раскомментировать когда настроен self-hosted runner с 1С:
+  # build:
+  #   name: Сборка .cfe
+  #   runs-on: self-hosted
+  #   needs: syntax-check
+  #   steps:
+  #     - uses: actions/checkout@v4.2.2
+  #     - name: Установить oScript
+  #       run: choco install onescript -y
+  #     - name: Собрать расширение
+  #       run: oscript src/tasks/build.os
+  #     - name: Загрузить артефакт
+  #       uses: actions/upload-artifact@v4.6.2
+  #       with:
+  #         name: extension-cfe
+  #         path: src/build/out/*.cfe
+

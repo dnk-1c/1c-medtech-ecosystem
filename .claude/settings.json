@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Edit(tasks/*.os)",
+      "Edit(src/tasks/*.os)",
+      "Edit(tools/*.ps1)"
+    ]
+  }
+}
